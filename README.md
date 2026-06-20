@@ -62,7 +62,3 @@ The script ships with a sample instance featuring:
 - Item-specific setup costs, holding costs, and a shared per-period production capacity
 
 These parameters (`d`, `K`, `c`, `h`, `C`) can be freely modified to test other scenarios.
-
-## License
-
-No license has been specified for this repository. Please contact the author before reusing this code for purposes beyond personal study or reference.
