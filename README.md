@@ -8,61 +8,26 @@ The Capacitated Lot Sizing Problem (CLSP) is a classic production planning probl
 
 This repository contains a working R implementation of the multi-item variant, where several products compete for the same capacitated resource in every time period.
 
-## Mathematical Formulation
+## Problem Formulation
 
-### Sets
-- $T$ = the planning horizon (index $t = 0, 1, \dots, n$)
-- $J$ = set of items (index $j = 1, \dots, m$)
+For each item *j* and period *t*, the model decides:
 
-### Parameters
-- $d_{tj}$ = the demand forecast at time $t$ for item $j$
-- $c_{tj}$ = the unit production or purchasing cost at time $t$ for item $j$
-- $h_{tj}$ = the unit inventory cost at time $t$ for item $j$
-- $K_j$ = the fixed setup or ordering cost for item $j$
-- $C_{tj}$ = the maximum feasible lot size (capacity) at time $t$ for item $j$
+- **q[t, j]** — quantity of item *j* produced in period *t*
+- **I[t, j]** — inventory level of item *j* at the end of period *t*
+- **y[t, j]** — binary setup indicator (1 if item *j* is produced in period *t*, 0 otherwise)
 
-### Variables
-- $I_{tj}$ = inventory level at the end of period $t$ for item $j$
-- $q_{tj}$ = quantity to be produced or ordered during period $t$ for item $j$
-- $y_{tj} = \begin{cases} 1 & \text{if units of item } j \text{ are manufactured/ordered in period } t \\ 0 & \text{otherwise} \end{cases}$
+**Objective** — minimize total cost, composed of:
+- Setup costs (`K[j]`), incurred whenever an item is produced in a period
+- Unit production costs (`c[t, j]`)
+- Unit inventory holding costs (`h[t, j]`)
 
-### Objective Function
+**Constraints**:
+- Initial and final inventory levels are fixed
+- Inventory balance across consecutive periods (production + opening stock = demand + closing stock)
+- Production in a period is only allowed if the setup variable is activated, and is bounded by the period's available capacity
+- All resource capacity limits (`C[t]`) must be respected
 
-$$
-\min \sum_{t=1}^{n} \sum_{j=1}^{m} \Big( K_j \cdot y_{tj} + c_{tj} \cdot q_{tj} + h_{tj} \cdot I_{tj} \Big) \tag{1}
-$$
-
-### Constraints
-
-$$
-I_{tj} = 0 \qquad t = 0 \text{ and } t = n;\ \forall j \in J \tag{2}
-$$
-
-$$
-q_{tj} + I_{t-1,j} = d_{tj} + I_{tj} \qquad \forall t \in T \setminus \{0\};\ \forall j \in J \tag{3}
-$$
-
-$$
-q_{tj} \le C_{tj} \cdot y_{tj} \qquad \forall t \in T \setminus \{0\};\ \forall j \in J \tag{4}
-$$
-
-$$
-q_{tj} \ge 0 \qquad \forall t \in T \setminus \{0\};\ \forall j \in J \tag{5}
-$$
-
-$$
-I_{tj} \ge 0 \qquad \forall t \in T \setminus \{0\};\ \forall j \in J \tag{6}
-$$
-
-$$
-y_{tj} \in \{0,1\} \qquad \forall t \in T \setminus \{0\};\ \forall j \in J \tag{7}
-$$
-
-### Interpretation
-
-The objective function (1) represents the total management costs, including production (and/or purchasing), inventory, and setup/ordering costs. Conditions (2) impose that inventory levels at the beginning and end of the planning horizon are equal to zero. Constraints (3) reproduce the demand satisfaction and inventory balance constraint for each period. Constraints (4)–(5) allow positive production (bounded between 0 and the period capacity $C_{tj}$) if and only if the setup variable $y_{tj}$ is equal to 1.
-
-A copy of this formulation is also available as a standalone PDF in this repository.
+A detailed mathematical formulation is provided in the accompanying PDF document included in this repository.
 
 ## Repository Contents
 
@@ -97,7 +62,3 @@ The script ships with a sample instance featuring:
 - Item-specific setup costs, holding costs, and a shared per-period production capacity
 
 These parameters (`d`, `K`, `c`, `h`, `C`) can be freely modified to test other scenarios.
-
-## License
-
-No license has been specified for this repository. Please contact the author before reusing this code for purposes beyond personal study or reference.
